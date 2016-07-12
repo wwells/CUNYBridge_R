@@ -32,6 +32,7 @@ quad <- function(a,b,c) {
     }
 }
 
+## Testing
 #two real numbers
 quad(5,6,1)
 #single solution
