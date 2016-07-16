@@ -39,12 +39,18 @@ choose <- function(n, r) {
 #### Standard answers
 
 ```{r}
-choose(5,3)
-choose(10,2)
+a1 <- choose(5,3)
+a2 <- choose(10,2)
 ```
+
+a1 = `r a1`
+a2 = `r a2`
 
 #### Exceptions
 ```{r}
-choose(2,4)
-choose(2,2)
+e1 <- choose(2,4)
+e2 <- choose(2,2)
 ```
+
+e1 = `r e1`
+e2 = `r e2`
