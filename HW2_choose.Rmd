@@ -1,0 +1,50 @@
+# CUNY Bridge Program, R Module, Week 2 Homework
+## Create a Function for "N choose R"
+### Define the function
+
+```{r}
+
+choose <- function(n, r) {
+    if (n - r < 0) {
+        answer <- 0
+        answer
+    } else if (n - r == 0) {
+        answer <- 1
+        answer
+    } else if (n - r > 0) {
+        nfact <- 1
+        for (i in 1:n) {
+            nfact <- nfact * i
+            nfact
+        }
+        rfact <- 1
+        for (i in 1:r) {
+            rfact <- rfact * i
+            rfact
+        }
+        sub <- n - r
+        sfact <- 1
+        for (i in 1:sub) {
+            sfact <- sfact * i
+            sfact
+        }
+        answer <- nfact / (sfact * rfact)
+        answer
+    }
+}
+
+```
+### Test the Function
+
+#### Standard answers
+
+```{r}
+choose(5,3)
+choose(10,2)
+```
+
+#### Exceptions
+```{r}
+choose(2,4)
+choose(2,2)
+```
