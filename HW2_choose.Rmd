@@ -7,10 +7,8 @@
 mychoose <- function(n, r) {
     if (n - r < 0) {
         answer <- 0
-        answer
-    } else if (n - r == 0) {
+    } else if (n - r == 0 || r == 0) {
         answer <- 1
-        answer
     } else if (n - r > 0) {
         nfact <- 1
         for (i in 1:n) {
@@ -29,8 +27,8 @@ mychoose <- function(n, r) {
             sfact
         }
         answer <- nfact / (sfact * rfact)
-        answer
     }
+    answer
 }
 
 ```
@@ -50,7 +48,9 @@ a2 = `r a2`
 ```{r}
 e1 <- mychoose(2,4)
 e2 <- mychoose(2,2)
+e3 <- mychoose(2,0)
 ```
 
 e1 = `r e1`
 e2 = `r e2`
+e3 = `r e3`
