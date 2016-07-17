@@ -4,7 +4,7 @@
 
 ```{r}
 
-choose <- function(n, r) {
+mychoose <- function(n, r) {
     if (n - r < 0) {
         answer <- 0
         answer
@@ -39,8 +39,8 @@ choose <- function(n, r) {
 #### Standard answers
 
 ```{r}
-a1 <- choose(5,3)
-a2 <- choose(10,2)
+a1 <- mychoose(5,3)
+a2 <- mychoose(10,2)
 ```
 
 a1 = `r a1`
@@ -48,8 +48,8 @@ a2 = `r a2`
 
 #### Exceptions
 ```{r}
-e1 <- choose(2,4)
-e2 <- choose(2,2)
+e1 <- mychoose(2,4)
+e2 <- mychoose(2,2)
 ```
 
 e1 = `r e1`
