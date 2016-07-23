@@ -10,7 +10,7 @@ for (i in 1:12) {
 
 numVector <- seq(20, 50, by=5)
 
-#3.Show how to take a trio of input numbers a, b, and c 
+#3.  Show how to take a trio of input numbers a, b, and c 
 # and implement the quadratic equation
 
 quad <- function(a,b,c) {
