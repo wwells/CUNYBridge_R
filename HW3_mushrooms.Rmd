@@ -1,0 +1,66 @@
+---
+title: "HW3 - Mushrooms"
+output: html_document
+---
+#### Walt Wells - 07.23-07.30.2016
+
+### Prepare Environment and Load Data
+```{r warning=FALSE, message=FALSE}
+# Set Environment
+if (!require("RCurl")) install.packages('RCurl')
+if (!require("data.table")) install.packages('data.table')
+if (!require("DT")) install.packages('DT')
+if (!require("plyr")) install.packages('plyr')
+
+# Import Data
+if(!exists("dat")) {
+    URL <- "https://raw.githubusercontent.com/wwells/CUNYBridge_R/master/agaricus-lepiota.data"
+    x <- getURL(URL)
+    dat <- fread(x, header=FALSE)
+}
+
+# Change to DF instead of DT
+dat <- data.frame(dat)
+
+# Preview
+head(dat)
+```
+
+### Subset
+```{r}
+# choose class, cap-shape, cap-surface, cap-color, population, and habitat
+##  these decisions are arbitratry for the purposes of this project.   we'd otherwise 
+##  want to do some additional data exploration before finalizing our subset
+mdat <- dat[,c(1:4, 22, 23)]
+
+# Preview Data
+head(mdat)
+```
+
+### Rename Columns and Data
+``` {r}
+# Update vars and colnames by creating new cols
+mdat$class <- revalue(mdat$V1, c("e"="edible", "p"="poisonous"))
+mdat$class <- factor(mdat$class)
+mdat$cshape <- revalue(mdat$V2, c("b"="bell", "c"="conical", "x"="convex",
+                                  "f"="flat", "k"="knobbed", "s"="sunken"))
+mdat$csurface <- revalue(mdat$V3, c("f"="fibrous", "g"="grooves", "y"="scaly",
+                                    "s"="smooth"))
+mdat$ccolor <- revalue(mdat$V4, c("n"="brown", "b"="buff", "c"="cinnamon",
+                                  "g"="gray", "r"="green", "p"= "pink",
+                                  "u"="purple", "e"="red", "w"="white",
+                                  "y"="yellow"))
+mdat$population <- revalue(mdat$V22, c("a"="abundant", "c"="clustered",
+                                       "n"="numerous", "s"="scattered",
+                                       "v"="several", "y"="solitary"))
+mdat$habitat <- revalue(mdat$V23, c("g"="grasses", "l"="leaves", "m"="meadows",
+                                    "p"="paths", "u"="urban", "w"="waste",
+                                    "d"="woods"))
+
+# Remove raw columns, once accuracy of renaming assured
+mdat <- mdat[, c(7:12)]
+
+# Use datatable to review curated data
+datatable(mdat, options = list(pageLength = 5))
+
+```
