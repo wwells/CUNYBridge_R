@@ -1,0 +1,77 @@
+---
+title: "HW4 - Exploratory Data Analysis - Baseball"
+output: html_document
+---
+#### Walt Wells - 07.31-08.07.2016
+
+
+### Prepare Environment and Load Data
+```{r warning=FALSE, message=FALSE}
+# Set Environment
+if (!require("plyr")) install.packages("plyr")
+if (!require("dplyr")) install.packages("dplyr")
+if (!require("DT")) install.packages('DT')
+if (!require("ggplot2")) install.packages("ggplot2")
+
+# Let's look at baseball data
+df <- baseball
+head(df)
+```
+
+### Explore and Subset
+```{r}
+## lets compare the HRs for Barry Bonds (bondsba01), Mark McGwire (mcgwima01), and Sammy Sosa (sosasa01)
+# id source - http://www.baseball-reference.com/data/war_daily_bat.txt
+sub <- df %>% 
+    filter(id=="bondsba01" | id == "mcgwima01" | id == "sosasa01")
+table(sub$id, sub$year)
+
+# we can see there is overlap between the 3 players from 1989 - 2001.   let's just look at those years. 
+sub <- sub %>%
+    filter(year >= 1989 & year <= 2001)
+table(sub$id, sub$year)
+```
+
+### Clean, Rename
+```{r}
+# we can see that there are some double entries where players played for two teams in a year.   we should a) subset further to only the data we care about b) show only one entry per player/id per year, c) rename cols, players
+
+# a) subset further
+homers <- sub %>%
+    select(id, year, hr)
+
+# b) one year per id
+homers <-  homers %>% 
+    group_by(year, id) %>%
+    summarise_each(funs(sum))
+
+# c) rename
+names(homers) <- c("Year", "Player", "HomeRuns")
+homers$Player <- factor(revalue(homers$Player, c("bondsba01"="Barry Bonds", 
+                                          "mcgwima01"="Mark McGwire", 
+                                          "sosasa01" = "Sammy Sosa")))
+
+# let's confirm this is what we want to plot:
+datatable(homers, options = list(pageLength = 5))
+
+```
+
+### Exploratory Plots
+```{r}
+#hist
+p <- ggplot(homers, aes(HomeRuns)) + geom_histogram(aes(fill=Player), binwidth=5, color="white")
+p + facet_grid(. ~Player) + ggtitle("Annual HR, 1989-2001") + 
+    theme(legend.position='none')
+
+#boxplot
+p <- ggplot(homers, aes(x=Player, y=HomeRuns)) 
+p + geom_boxplot(aes(fill=Player)) + ggtitle("Annual HR, 1989-2001") + 
+    theme(legend.position='none') + xlab("")
+
+#scatterplot
+p <- ggplot(homers, aes(x=Year, y=HomeRuns)) 
+p + geom_point(aes(color=Player)) + geom_hline(yintercept=61, color="red") +
+    annotate("text", 1990, 61+4, label = "Roger Maris \n HR Record", 
+             size =3, color = 'red') + ggtitle("Annual HR, 1989-2001")
+
+```
