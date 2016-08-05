@@ -1,5 +1,5 @@
 ---
-title: "HW4 - Exploratory Data Analysis - Baseball"
+title: "HW4: Exploratory Data Analysis - Baseball"
 output: html_document
 ---
 #### Walt Wells - 07.31-08.07.2016
