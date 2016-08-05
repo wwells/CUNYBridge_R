@@ -1,3 +1,4 @@
+### Walt Wells - HW1, 7.10-7.17.2016
 #1. Write a loop that calculates 12-factorial.
 
 x <- 1
