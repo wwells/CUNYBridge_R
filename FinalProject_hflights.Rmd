@@ -1,0 +1,93 @@
+---
+title: "CUNY Bridge: R Final Project - hflights"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment=NA)
+```
+
+### Walt Wells, 07.31-08.11.2016
+
+### Prepare Environment and Load Data
+```{r warning=FALSE, message=FALSE}
+# Set Environment
+if (!require("plyr")) install.packages("plyr")
+if (!require("dplyr")) install.packages("dplyr")
+if (!require("hflights")) install.packages("hflights")
+
+# Let's take an initial look at the data
+# derived from:  http://www.transtats.bts.gov/DatabaseInfo.asp?DB_ID=120&Link=0
+data(hflights)
+str(hflights)
+```
+
+### Explore
+```{r}
+# Look at origin patterns
+table(hflights$UniqueCarrier)
+
+# Look at arrival delay patterns
+table(cut(hflights$Distance,6), cut(hflights$ArrDelay, 6))
+table(hflights$UniqueCarrier, cut(hflights$ArrDelay, 6))
+
+hflights %>% 
+    group_by(UniqueCarrier) %>%
+    summarise(MeanArrDelay = mean(ArrDelay, na.rm=TRUE), SDArrDelay = sd(ArrDelay, na.rm=TRUE))
+
+# Let's double check an assumption.   The table for unique carrier shows 70032 flights for CO carrier.   But it looks like the table showinng arrival delay bins by carrier < 70032.   Where are the missing values?  
+co <- filter(hflights, UniqueCarrier == "CO")
+sum(table(cut(co$ArrDelay, 6)))
+sum(table(cut(co$ArrDelay, 6))) + sum(co$Diverted) + sum(co$Cancelled)
+```
+
+### Subset, Clean
+```{r}
+# OK - let's look at the airlines with more than 10,000 records.   We'll explore the relationship between those carriers and the Arrival Delays.  
+
+sub <- hflights %>%
+    select(UniqueCarrier, ArrDelay, Diverted, Cancelled)
+
+fdat <- sub %>%
+    filter(UniqueCarrier %in% c('CO', 'OO', 'WN', 'XE'))
+
+# now we'll let's bin according to arrival time.   We'll define 5 categories: 
+# early, ontime (+ or - 5 min), 5~30, 30~120, >120
+
+ftab <- table(fdat$UniqueCarrier, cut(fdat$ArrDelay, breaks=c(-90, -5, 5, 30, 120, 1000), labels = c("Early", "OnTime", "5-30 Late", "30-120 Late", "> 120 Late")))
+row.names(ftab) <- c("Continental", "SkyWest", "SouthWest", "ExpressJet")
+```
+
+### Plots
+
+```{r, fig.width = 8, fig.height=6}
+
+# Let's try some Cleveland plots. 
+
+dotchart(ftab, main= "Frequency of Arrival Delays for Airlines with > 10,000 flights", xlab="Frequency")
+
+# Great! This gives us a good rough idea of the arrival delays for each carrier.   Now, let's normalize by calculating the percentage of occurences for each carrier's total flights. 
+
+CO <- sum(sub$UniqueCarrier=="CO")
+OO <- sum(sub$UniqueCarrier=="OO")
+WN <- sum(sub$UniqueCarrier=="WN")
+XE <- sum(sub$UniqueCarrier=="XE")
+
+df <- data.frame(ftab)
+df <- df %>%
+    mutate(Per = ifelse(Var1 == "Continental", round(Freq/CO, 3) * 100, 
+                        ifelse(Var1 == "SkyWest", round(Freq/OO, 3) * 100,
+                               ifelse(Var1 == "SouthWest", round(Freq/WN, 3) * 100,
+                                      round(Freq/XE, 3) * 100)
+                               )
+                        )
+           ) 
+
+## we double check our work, confirming that the reason that arrival delays don't add up to 100% is that they don't account for flights diverted or cancelled
+sum(df$Per[df$Var1=="SouthWest"])
+sum(df$Freq[df$Var1=="SouthWest"]) + sum(sub$Diverted[sub$UniqueCarrier=="WN"]) +
+    sum(sub$Cancelled[sub$UniqueCarrier=="WN"])
+
+
+#now let's plot and see what we get
+dotchart(df$Per, labels=df$Var1, groups=df$Var2, main="% of Arrival Delays for Airlines with > 10,000 flights", xlab="% of Carrier Flights")
+```
